@@ -9,7 +9,7 @@ router.post('/api/reset', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  res.status(200)
+  res.status(200).end()
 })
 
 module.exports = router
