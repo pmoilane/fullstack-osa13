@@ -3,6 +3,7 @@ const { SECRET } = require('../util/config');
 
 const errorHandler = (error, req, res, next) => {
   console.error(error.message);
+  console.log(error);
 
   if (error.name === 'SequelizeValidationError') {
     console.log('SequelizeValidationError');
@@ -13,6 +14,17 @@ const errorHandler = (error, req, res, next) => {
   } else if (error.name === 'SequelizeDatabaseError') {
     console.log('SequelizeDatabaseError');
     return res.status(400).send({ error: error.message });
+  } else if (error.name === 'SequelizeForeignKeyConstraintError') {
+    console.log('SequelizeForeignKeyConstraintError');
+    if (error.index.includes('reading_lists_user_id_fkey')) {
+      return res
+        .status(400)
+        .send({ error: 'user with userId does not exist ' });
+    } else if (error.index.includes('reading_lists_blog_id_fkey')) {
+      return res
+        .status(400)
+        .send({ error: 'blog with blogId does not exist ' });
+    }
   }
 
   next(error);

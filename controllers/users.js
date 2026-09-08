@@ -1,14 +1,14 @@
-const router = require('express').Router()
+const router = require('express').Router();
 
-const { User, Blog } = require('../models')
+const { User, Blog, ReadingList } = require('../models');
 
 router.post('/', async (req, res) => {
   if (req.body.password) {
-    delete req.body.password
+    delete req.body.password;
   }
-  const user = await User.create(req.body)
-  res.json(user)
-})
+  const user = await User.create(req.body);
+  res.json(user);
+});
 
 router.get('/', async (req, res) => {
   const users = await User.findAll({
@@ -18,19 +18,36 @@ router.get('/', async (req, res) => {
         exclude: ['userId'],
       },
     },
-  })
-  res.json(users)
-})
+  });
+  res.json(users);
+});
+
+router.get('/:id', async (req, res) => {
+  const user = await User.findByPk(req.params.id, {
+    attributes: { exclude: ['createdAt', 'updatedAt', 'id'] },
+    include: [
+      {
+        model: Blog,
+        as: 'readings',
+        attributes: { exclude: ['userId', 'createdAt', 'updatedAt'] },
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  });
+  res.json(user);
+});
 
 router.put('/:username', async (req, res) => {
   const user = await User.findOne({
     where: {
       username: req.params.username,
     },
-  })
-  user.name = req.body.name
-  await user.save()
-  res.json(req.user)
-})
+  });
+  user.name = req.body.name;
+  await user.save();
+  res.json(req.user);
+});
 
-module.exports = router
+module.exports = router;
