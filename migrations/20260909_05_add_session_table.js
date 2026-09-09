@@ -17,6 +17,14 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     });
   },
   down: async ({ context: queryInterface }) => {

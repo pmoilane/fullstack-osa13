@@ -4,7 +4,7 @@ const User = require('../models/user');
 const Session = require('../models/session');
 const { tokenExtractor } = require('../util/middleware');
 
-router.post('/', tokenExtractor, async (req, res) => {
+router.delete('/', tokenExtractor, async (req, res) => {
   await Session.destroy({
     where: {
       userId: req.decodedToken.id,

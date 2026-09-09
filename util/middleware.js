@@ -20,13 +20,15 @@ const errorHandler = (error, req, res, next) => {
     console.log('SequelizeForeignKeyConstraintError');
     if (error.index.includes('reading_lists_user_id_fkey')) {
       return res
-        .status(400)
+        .status(404)
         .send({ error: 'user with userId does not exist ' });
     } else if (error.index.includes('reading_lists_blog_id_fkey')) {
       return res
-        .status(400)
+        .status(404)
         .send({ error: 'blog with blogId does not exist ' });
     }
+  } else if (error.message.includes('has invalid')) {
+    return res.status(400).send({ error: error.message });
   }
 
   next(error);

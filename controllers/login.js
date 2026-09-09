@@ -12,9 +12,7 @@ router.post('/', async (req, res) => {
     },
   });
 
-  const passwordCorrect = req.body.password === 'secret';
-
-  if (!(user && passwordCorrect)) {
+  if (!user) {
     return res.status(401).json({
       error: 'invalid username or password',
     });
@@ -23,6 +21,7 @@ router.post('/', async (req, res) => {
   const userForToken = {
     username: user.username,
     id: user.id,
+    password: 'secret',
   };
 
   const token = jwt.sign(userForToken, SECRET);
@@ -30,6 +29,8 @@ router.post('/', async (req, res) => {
   await Session.create({
     token: token,
     userId: user.id,
+    username: user.username,
+    name: user.name,
   });
 
   res.status(200).json({ token, username: user.username, name: user.name });
