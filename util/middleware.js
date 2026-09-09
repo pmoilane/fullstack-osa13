@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { SECRET } = require('../util/config');
+const User = require('../models/user');
+const Session = require('../models/session');
 
 const errorHandler = (error, req, res, next) => {
   console.error(error.message);
@@ -30,7 +32,7 @@ const errorHandler = (error, req, res, next) => {
   next(error);
 };
 
-const tokenExtractor = (req, res, next) => {
+const tokenExtractor = async (req, res, next) => {
   const authorization = req.get('authorization');
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     try {
@@ -41,6 +43,26 @@ const tokenExtractor = (req, res, next) => {
   } else {
     return res.status(401).json({ error: 'token missing' });
   }
+  const user = await User.findByPk(req.decodedToken.id);
+  if (user.disabled === true) {
+    await Session.destroy({
+      where: {
+        userId: user.id,
+      },
+    });
+    return res.status(403).end();
+  }
+
+  const session = await Session.findOne({
+    where: {
+      token: authorization.substring(7),
+    },
+  });
+
+  if (session === null) {
+    return res.status(401).send({ error: 'token not valid' });
+  }
+
   next();
 };
 
